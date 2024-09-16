@@ -30,9 +30,9 @@ void main()
 	uv.x *= iResolution.x / iResolution.y;
 	
 	float distance = length(uv);
-	float shapeRes = sdParabola(vec2(uv.x, uv.y - iMouse.y), -0.2 * iMouse.x);
+	float shapeRes = sdParabola(vec2(uv.x, uv.y - (iMouse.y - 1.0)), -0.3 * iMouse.x);
 	
-	vec3 color = vec3(1.0, 2.0, 3.0);
+	vec3 color = vec3(1.0, 3.0, 2.0);
 	
 	//shapeRes = sin((shapeRes * 5.0) - iTime)/5.;
 	//shapeRes = shapeRes;

@@ -39,8 +39,8 @@
 
 		window.addEventListener('mousemove', (event) => {
             // Normaliser les coordonnées de la souris entre 0.0 et 1.0
-            uniforms.iMouse.value.x = event.clientX / window.innerWidth;
-            uniforms.iMouse.value.y = 1.0 - event.clientY / window.innerHeight;  // Inverser Y pour correspondre au système de coordonnées du shader
+            uniforms.iMouse.value.x = Math.abs((event.clientX - window.innerWidth / 2) / window.innerWidth);
+            uniforms.iMouse.value.y = Math.abs(1.0 - (event.clientY - window.innerHeight / 2) / window.innerHeight);  // Inverser Y pour correspondre au système de coordonnées du shader
         });
 
 		// 5. Charger le fichier fragment shader
