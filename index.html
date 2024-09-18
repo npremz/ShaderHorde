@@ -7,9 +7,36 @@
     <style>
         body { margin: 0; }
         canvas { display: block; }
+
+		svg{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0.7;
+		}
     </style>
 </head>
 <body>
+
+
+	<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg" version="1.1">
+		<!-- Définition des filtres -->
+		<defs>
+		  <!-- Filtre de bruit (noise) -->
+		  <filter id="noise">
+			<!-- Application du flou gaussien -->
+			<feGaussianBlur in="noise" stdDeviation="5" result="blurredNoise" />
+			<!-- Turbulence pour générer du bruit -->
+			<feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="20" result="noise" />
+		  </filter>
+		</defs>
+	  
+		<!-- Application du filtre sur un rectangle -->
+		<rect width="100%" height="100%" filter="url(#noise)" />
+	</svg>
+	
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script id="vertexShader" type="x-shader/x-vertex">
         void main() {
@@ -17,66 +44,6 @@
         }
     </script>
     <script id="fragmentShader" src="shader.glsl" type="x-shader/x-fragment"></script>
-    <script>
-        // 1. Initialisation de la scène
-    	const scene = new THREE.Scene();
-
-		// 2. Caméra
-		const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera.position.z = 1;
-
-		// 3. Renderer
-		const renderer = new THREE.WebGLRenderer();
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		document.body.appendChild(renderer.domElement);
-
-		// 4. Uniformes (pour passer iTime et iResolution)
-		const uniforms = {
-			iTime: { value: 0.0 },
-			iResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-			iMouse: { value: new THREE.Vector2(0.0, 0.0) }  // Position de la souris initialisée à zéro
-		};
-
-		window.addEventListener('mousemove', (event) => {
-            // Normaliser les coordonnées de la souris entre 0.0 et 1.0
-            uniforms.iMouse.value.x = Math.abs((event.clientX - window.innerWidth / 2) / window.innerWidth);
-            uniforms.iMouse.value.y = Math.abs(1.0 - (event.clientY - window.innerHeight / 2) / window.innerHeight);  // Inverser Y pour correspondre au système de coordonnées du shader
-        });
-
-		// 5. Charger le fichier fragment shader
-		fetch('fragmentShader.glsl')
-            .then(response => response.text())
-            .then(fragmentShaderCode => {
-                // Créer le matériau avec le fragment shader chargé
-                const material = new THREE.ShaderMaterial({
-                    uniforms: uniforms,
-                    vertexShader: `
-                        void main() {
-                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                        }
-                    `,
-                    fragmentShader: fragmentShaderCode
-                });
-
-                // 6. Géométrie et application du matériau
-                const geometry = new THREE.PlaneGeometry(4, 2);
-                const plane = new THREE.Mesh(geometry, material);
-                scene.add(plane);
-
-                // 7. Animation
-                function animate(time) {
-                    requestAnimationFrame(animate);
-
-                    // Mettre à jour l'uniforme iTime avec le temps écoulé
-                    uniforms.iTime.value = time * 0.001;  // Convertir en secondes
-
-                    // Rendu de la scène
-                    renderer.render(scene, camera);
-                }
-
-                animate();
-            })
-            .catch(err => console.error("Erreur lors du chargement du fragment shader : ", err));
-    </script>
+    <script src="shader.js"></script>
 </body>
 </html>
